@@ -173,18 +173,6 @@ The test agents in our case study are pedestrians. At the start of a test, pedes
 \subsubsection{Random Based}
 For the random class, \textit{random} behaviour means that the test agent can perform any random action at each simulation tick, with the available actions being: do nothing (stand still), move forward, backward, left or right. In \textit{constrained random} mode, the pedestrian is initially walking along the pavement and has only one action available; to randomly choose when to cross the road. The constrained random behaviour is included so that a comparison between crossing the road at a targeted or at a random time can be made. 
 
-\todo[inline]{give algorithm for each agent type?}
-% \begin{algorithm}
-% \caption{Random}
-% \begin{algorithmic}[1]
-% \While $ t < t\max$
-% \State A_r = rand(5)
-% |State action(A_r)
-% \EndWhile
-% \end{algorithmic}
-% \end{algorithm}
-
-
 \begin{algorithm}
 \caption{Random Action}\label{algo:rand}
 \begin{algorithmic}[1]
@@ -246,8 +234,7 @@ The second class of behaviours is agency-directed, taking into account the agent
 
 \subsubsection{Reinforcement Learning Based}
 % Agent numbers
-The final factor to consider is the number of agents per test; too few and the likelihood of an agent activating the assertion will be low and entirely dependent on the initial starting position of the agent in the test environment due to differences in speed. The number of agents is physically limited by the number of available grid locations (1.5m spacing) on the pavement. 
-As the number of agents, $nA$, increases, it is expected that the probability of activating the assertion using a random behaviour increases significantly as more agents appear in the road, with a corresponding increase in computational expense. In comparison, when using more intelligent, agency-directed behaviour, we expect that with increasing $nA$, agents that can activate the assertion precondition are being generated more readily, thus resulting in shorter, less complex and hence more efficient tests. The range of $nA$ explored in this case study is from 1 to 20.
+The final factor to consider is the number of agents per test; too few and the likelihood of an agent activating the assertion will be low and entirely dependent on the initial starting position of the agent in the test environment due to differences in speed. The number of agents is physically limited by the number of available grid locations (1.5m spacing) on the pavement. As the number of agents, $nA$, increases, it is expected that the probability of activating the assertion using a random behaviour increases significantly as more agents appear in the road, with a corresponding increase in computational expense. In comparison, when using more intelligent, agency-directed behaviour, we expect that with increasing $nA$, agents that can activate the assertion precondition are being generated more readily, thus resulting in shorter, less complex and hence more efficient tests. The range of $nA$ explored in this case study is from 1 to 20.
 
 %------------------- Scoring -----------------------------
 \subsection{Scoring}
