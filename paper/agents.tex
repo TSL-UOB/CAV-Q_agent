@@ -170,6 +170,9 @@ The environment is initialised with the agents spawned randomly on any valid spa
 
 The test agents in our case study are pedestrians. At the start of a test, pedestrians are randomly located onto the pavement area using valid spawn locations. The AV is a vehicle that drives at constant speed in a straight line, it does not brake or turn. For the purpose of comparing the performance of agent-based test generation techniques, the test agents have different behaviours from simple random (i.e.\ no direction through agency) to more directed, strategic planning-based agency, details of these are provided in this section. We distinguish three main classes of behaviours, random, agency-directed and Q-learning, see also Table~\ref{t:ResultsTable}. 
 
+% Agent numbers
+The number of agents generated per test should also be considered; too few and the likelihood of an agent activating the assertion will be low and heavily dependent on the initial starting position of the agent in the test environment, the size of the environment and differences in speed. The number of agents is physically limited by the number of available grid locations (1.5m spacing) on the pavement. As the number of agents, $nA$, increases, it is expected that the probability of activating the assertion using any behaviour increases significantly as more agents appear in the road, with a corresponding increase in computational expense. In comparison, when using more intelligent, agency-directed behaviour, we expect that fewer agents can activate the assertion precondition more readily, thus resulting in shorter, less complex and hence more efficient tests. The range of $nA$ explored in this case study is from 1 to 20.
+
 \subsubsection{Random Based}
 For the random class, \textit{random} behaviour means that the test agent can perform any random action at each simulation tick, with the available actions being: do nothing (stand still), move forward, backward, left or right. In \textit{constrained random} mode, the pedestrian is initially walking along the pavement and has only one action available; to randomly choose when to cross the road. The constrained random behaviour is included so that a comparison between crossing the road at a targeted or at a random time can be made. 
 
@@ -242,54 +245,22 @@ Q'(s_t, a_t) \gets Q(s_t, a_t) + \alpha \cdot \big[r_t + \gamma \cdot \max_{a} Q
 where $\alpha$ is the learning rate and $Q'$ is the updated $q$ value given the agent took action $a$ in state $s$ at time $t$ and gets reward $r$ plus the future discounted value of $\max_{a} (Q)$ at time $t+1$ where the addition refers to another episode. The major limitation of this method is that it requires lookup tables to describe the Q values for the state-action space which may be computationally cumbersome for large domains not to mention the time for the agents to explore each state and action combination. A variation of Q-learning to overcome the infinite state-space problem using function approximation~\cite{baird1995residual} can be adapted here for the use of agents in open and dynamic environments. Using a fixed set of independent linear functions, the Q-learning function can be described as a weighted sum of the functions:
 
 \begin{equation*}
-Q'(s_t, a_t) = w_1f_1(s,a)+...+w_if_i(s,a)
+Q'(s_t, a_t) = w_1\theta_1(s,a)+...+w_i\theta_i(s,a)
 \end{equation*}
 
-where $w$ is the weight associated with each functional approximation of the state-action pair $f(s,a)$. After each episode the current reward and discounted future value represents the temporal difference learning element, $\delta$:
+where $w$ is the weight associated with each functional approximation of the state-action pair $\theta(s,a)$. After each episode the current reward and discounted future value represents the temporal difference learning element, $\delta$:
 
 \begin{equation*}
 \delta = r_t + \gamma \cdot \max_{a} Q(s_{t+1}, a_{t+1}) - Q(s_t,a_t)
 \end{equation*}
 
-and the weight update if performed based on the learning rate:
+and the weight update if performed based on the temporal difference element and the learning rate ($\alpha$):
 
+\begin{equation*}
+w_i \gets w_i  + \alpha \cdot \delta \theta_i(s,a)
+\end{equation*}
 
-
-
-Although proofs for convergence of the Q-learning theorem have been given~\cite{watkins1992q,melo2001convergence} this assumes infinite exploration in a controlled Markovian domain, discretised and deterministic.
- 
-
-% \begin{algorithm}[H]
-%     \begin{algorithmic}
-%     \Require
-%     \Statex Sates $\mathcal{X} = \{1, \dots, n_x\}$
-%     \Statex Actions $\mathcal{A} = \{1, \dots, n_a\},\qquad A: \mathcal{X} \Rightarrow \mathcal{A}$
-%     \Statex Reward function $R: \mathcal{X} \times \mathcal{A} \rightarrow \mathbb{R}$
-%     \Statex Black-box (probabilistic) transition function $T: \mathcal{X} \times \mathcal{A} \rightarrow \mathcal{X}$
-%     \Statex Learning rate $\alpha \in [0, 1]$, typically $\alpha = 0.1$
-%     \Statex Discounting factor $\gamma \in [0, 1]$
-%     \Procedure{QLearning}{$\mathcal{X}$, $A$, $R$, $T$, $\alpha$, $\gamma$}
-%         \State Initialize $Q: \mathcal{X} \times \mathcal{A} \rightarrow \mathbb{R}$ arbitrarily
-%         \While{$Q$ is not converged}
-%             \State Start in state $s \in \mathcal{X}$
-%             \While{$s$ is not terminal}
-%                 \State Calculate $\pi$ according to Q and exploration strategy (e.g. $\pi(x) \gets \argmax_{a} Q(x, a)$)
-%                 \State $a \gets \pi(s)$
-%                 \State $r \gets R(s, a)$ \Comment{Receive the reward}
-%                 \State $s' \gets T(s, a)$ \Comment{Receive the new state}
-%                 \State $Q(s', a) \gets (1 - \alpha) \cdot Q(s, a) + \alpha \cdot (r + \gamma \cdot \max_{a'} Q(s', a'))$
-%                 \State $s \gets s'$
-%             \EndWhile
-%         \EndWhile
-%         \Return $Q$
-%     \EndProcedure
-%     \end{algorithmic}
-% \caption{$Q$-learning: Learn function $Q: \mathcal{X} \times \mathcal{A} \rightarrow \mathbb{R}$}
-% \label{alg:q-learning}
-% \end{algorithm}
-
-% Agent numbers
-The final factor to consider is the number of agents per test; too few and the likelihood of an agent activating the assertion will be low and entirely dependent on the initial starting position of the agent in the test environment due to differences in speed. The number of agents is physically limited by the number of available grid locations (1.5m spacing) on the pavement. As the number of agents, $nA$, increases, it is expected that the probability of activating the assertion using a random behaviour increases significantly as more agents appear in the road, with a corresponding increase in computational expense. In comparison, when using more intelligent, agency-directed behaviour, we expect that with increasing $nA$, agents that can activate the assertion precondition are being generated more readily, thus resulting in shorter, less complex and hence more efficient tests. The range of $nA$ explored in this case study is from 1 to 20.
+Convergence proof of the Q-learning theorem has been given~\cite{melo2001convergence} although this is assuming infinite exploration in a controlled Markovian domain, discretised and deterministic~\cite{watkins1992q}. Q-learning using linear function approximation has also been proven by Melo et al.~\cite{Melo2008}. Implementing Q-learning with a vehicle controller may not be considered deterministic due to the use of neural networks in the perception stack\footnote{neural networks with fixed weights and no adaptive learning are deterministic mathematical structures within the data used to train them but in a practical sense there is no such control over the input data space} so may fail many of these convergence assumptions.
 
 %------------------- Scoring -----------------------------
 \subsection{Scoring}
