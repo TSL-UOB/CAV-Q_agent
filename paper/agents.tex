@@ -200,7 +200,7 @@ For the random class, \textit{random} behaviour means that the test agent can pe
 \end{algorithm}
 
 \subsubsection{Reactive Agency}
-The second class of behaviours is agency-directed, taking into account the agent's perceptions for strategic planning. Agents are initially walking along the pavement as in constrained random mode. The \textit{proximity} behaviour instructs the agent to cross the road when the AV is within a certain radius. The \textit{election} behaviour ranks agents within a proximity radius to the AV and elects the agent with the shortest distance to the AV. The trigger radius is 15 cells using city-block measure and is the same value for both \textit{proximity}  and \textit{election} behaviours. The major difference between the agent-directed behaviours is that the \textit{election} behaviour will only elect a single agent to cross the road whereas the \textit{proximity} behaviour will result any number of agents crossing the road as long as they are within range. While the \textit{proximity} behaviour may lead to the desired coverage it is less realistic than the \textit{election} behaviour. 
+The second class of behaviours is agency-directed, taking into account the agent's perceptions for strategic planning. Agents are initially walking along the pavement as in constrained random mode. The \textit{proximity} behaviour instructs the agent to cross the road when the AV is within a certain radius.  
 
 \begin{algorithm}
 \caption{Proximity}\label{algo:prox}
@@ -215,6 +215,8 @@ The second class of behaviours is agency-directed, taking into account the agent
 \EndWhile
 \end{algorithmic}
 \end{algorithm}
+
+The \textit{election} behaviour ranks agents within a proximity radius to the AV and elects the agent with the shortest distance to the AV. The trigger radius is 15 cells using city-block measure and is the same value for both \textit{proximity}  and \textit{election} behaviours. The major difference between the agent-directed behaviours is that the \textit{election} behaviour will only elect a single agent to cross the road whereas the \textit{proximity} behaviour will result any number of agents crossing the road as long as they are within range. While the \textit{proximity} behaviour may lead to the desired coverage it is less realistic than the \textit{election} behaviour.
 
 \begin{algorithm}
 \caption{Election}\label{algo:elect}
@@ -235,32 +237,50 @@ The second class of behaviours is agency-directed, taking into account the agent
 \end{algorithmic}
 \end{algorithm}
 
-\subsubsection{Reinforcement Learning Based}
+\subsubsection{Reinforcement Learning}
 Q-learning can be used to identify an optimal action-selection policy without an explicit environment model in controlled Markovian domains through agents experiencing the consequences of their actions~\cite{watkins1992q}. Actions ($a$) are selected using temporal difference method of expected rewards $R$ which are discounted by $\gamma$. For a given state $s$ at time $t$, the Q value is given by:
 
-\begin{equation*}
-Q'(s_t, a_t) \gets Q(s_t, a_t) + \alpha \cdot \big[r_t + \gamma \cdot \max_{a} Q(s_{t+1}, a_{t+1}) - Q(s_t,a_t)\big]
-\end{equation*}
+\begin{equation} \label{eq:q_update}
+Q(s_t, a_t) \gets Q(s_t, a_t) + \alpha \cdot \big[r_t + \gamma \cdot \max_{a} Q(s_{t+1}, a_{t+1}) - Q(s_t,a_t)\big]
+\end{equation}
 
 where $\alpha$ is the learning rate and $Q'$ is the updated $q$ value given the agent took action $a$ in state $s$ at time $t$ and gets reward $r$ plus the future discounted value of $\max_{a} (Q)$ at time $t+1$ where the addition refers to another episode. The major limitation of this method is that it requires lookup tables to describe the Q values for the state-action space which may be computationally cumbersome for large domains not to mention the time for the agents to explore each state and action combination. A variation of Q-learning to overcome the infinite state-space problem using function approximation~\cite{baird1995residual} can be adapted here for the use of agents in open and dynamic environments. Using a fixed set of independent linear functions, the Q-learning function can be described as a weighted sum of the functions:
 
-\begin{equation*}
-Q'(s_t, a_t) = w_1\theta_1(s,a)+...+w_i\theta_i(s,a)
-\end{equation*}
+\begin{equation} \label{eq:q_func}
+Q(s_t, a_t) = w_1\theta_1(s,a)+...+w_i\theta_i(s,a)
+\end{equation}
 
-where $w$ is the weight associated with each functional approximation of the state-action pair $\theta(s,a)$. After each episode the current reward and discounted future value represents the temporal difference learning element, $\delta$:
+where $w$ is the weight associated with each functional approximation of the state-space $\theta(s,a)$. After each episode the current reward and discounted future value represents the temporal difference learning element, $\delta$:
 
-\begin{equation*}
+\begin{equation} \label{eq:delta}
 \delta = r_t + \gamma \cdot \max_{a} Q(s_{t+1}, a_{t+1}) - Q(s_t,a_t)
-\end{equation*}
+\end{equation}
 
 and the weight update if performed based on the temporal difference element and the learning rate ($\alpha$):
 
-\begin{equation*}
+\begin{equation} \label{eq:weight}
 w_i \gets w_i  + \alpha \cdot \delta \theta_i(s,a)
-\end{equation*}
+\end{equation}
 
-Convergence proof of the Q-learning theorem has been given~\cite{melo2001convergence} although this is assuming infinite exploration in a controlled Markovian domain, discretised and deterministic~\cite{watkins1992q}. Q-learning using linear function approximation has also been proven by Melo et al.~\cite{Melo2008}. Implementing Q-learning with a vehicle controller may not be considered deterministic due to the use of neural networks in the perception stack\footnote{neural networks with fixed weights and no adaptive learning are deterministic mathematical structures within the data used to train them but in a practical sense there is no such control over the input data space} so may fail many of these convergence assumptions.
+The algorithm for the \textit{q-agent} is shown in Algorithm \ref{algo:q-agent} where $action\_space$ contains the valid actions for each agent given a limited (non-infinite) domain.
+
+\begin{algorithm}
+\caption{Q-Agent}\label{algo:q-agent}
+\begin{algorithmic}[1]
+\While{ $ t < t\max$}
+\State Sample $s_t$ 
+\State Get $Q(s_{t}, a_{t})$ using (\ref{eq:q_func})
+\State Sample $s_{t+1}$ from $action\_space$
+\State Update $Q(s_{t}, a_{t})$ using (\ref{eq:q_update})
+\State Select $a$ from $\max_{a}(Q(s_t,a_t))$
+\State Update ego and agent(s) state
+\State Get $r_t$ 
+\State Update $w_i$ using (\ref{eq:weight})
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+Convergence proof of the Q-learning theorem has been given~\cite{melo2001convergence} although this is assuming infinite exploration in a controlled Markovian domain, discretised and deterministic~\cite{watkins1992q}. Q-learning using linear function approximation has also been proven by Melo et al.~\cite{Melo2008}. Implementing Q-learning with a vehicle controller may not be considered deterministic due to the use of neural networks in the perception stack\footnote{neural networks with fixed weights and no adaptive learning are deterministic mathematical structures within the data used to train them but in a practical application there is no such control over the input data space} so may fail many of these convergence assumptions. However, when using these algorithms in a simulation domain, control over the input space can be regulated to give repeatable results under certain conditions~\cite{Chance2020}.
 
 %------------------- Scoring -----------------------------
 \subsection{Scoring}
