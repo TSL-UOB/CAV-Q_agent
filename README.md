@@ -5,7 +5,7 @@ In the animations below, when pedestrians (yellow squares) intersect the vehilce
 
 
 The Random test generation method uses random actions for shown here for 3 agents. 
-![](videos/RandAction.gif)
+![](videos\RandAction.gif)
 
 Constrained random forces the agents to walk on the pavement with the action to cross the road with 10% probability.
 ![](videos/RandBehav.gif)
