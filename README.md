@@ -5,16 +5,27 @@ In the animations below, when pedestrians (yellow squares) intersect the vehilce
 
 
 The Random test generation method uses random actions for shown here for 3 agents. 
+
 ![](videos/RandAction.gif)
 
 Constrained random forces the agents to walk on the pavement with the action to cross the road with 10% probability.
+
 ![](videos/RandBehav.gif)
 
 Proximity agents will only cross the road when there is a vehicle within 15 units.
+
 ![](videos/Proximity.gif)
 
 Election is based on the proximity agent, but here the agents decide which should attempt to cross the road based on who is closest.
+
 ![](videos/Election.gif)
 
 The Q-agent uses q-learning based on a functional representation of the environment.
+
 ![](videos/Q_agent.gif)
+
+The folowing graph shows the average accuracy for each method a producing sucessfull test over 50 episodes. Random agent actions perform the most poorly, generating the fewest useful tests. Constrained random does slightly better achieving around 50% accuracy. Proximity and Election achieve 80% and 70% respectively. The Q-agent achieves around 90% accuracy.
+
+Less simulation ticks are required when tests are generated quicker, these are seem in the shorter plot traces.
+
+![](videos/accuracy.gif)
