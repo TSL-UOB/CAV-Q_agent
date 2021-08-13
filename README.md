@@ -26,6 +26,6 @@ The Q-agent uses q-learning based on a functional representation of the environm
 
 The folowing graph shows the average accuracy for each method a producing sucessfull test over 50 episodes. Random agent actions perform the most poorly, generating the fewest useful tests. Constrained random does slightly better achieving around 50% accuracy. Proximity and Election achieve 80% and 70% respectively. The Q-agent achieves around 90% accuracy.
 
-Less simulation ticks are required when tests are generated quicker, these are seem in the shorter plot traces.
+Less simulation ticks are required when tests are generated quicker, these are seen in the shorter plot traces.
 
 ![](videos/accuracy.gif)
